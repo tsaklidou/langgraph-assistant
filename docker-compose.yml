@@ -1,0 +1,26 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    ports:
+      - "8501:8501"
+    environment:
+      #API keys and environment variables here
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - SERPAPI_API_KEY=${SERPAPI_API_KEY}
+      #any other environment variables your app needs
+    volumes:
+      # Optional: Mount data directory if you want to update data without rebuilding
+      - ./data:/app/data:ro
+      # Optional: Persist ChromaDB and SQLite database
+      - app-data:/app/src/chromadb
+      - app-db:/app/src/app
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+volumes:
+  app-data:
+  app-db:
